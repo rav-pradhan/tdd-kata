@@ -34,12 +34,12 @@ export default class TennisMatch {
   }
 
   gameHasAWinner() {
-    if (this.playerOne.score === 4 && this.playerTwo.score < 3) {
+    if (this.playerOne.score >= this.playerTwo.score + 2) {
       this.gameWinner = this.playerOne.name
       return true
     }
 
-    if (this.playerTwo.score === 4 && this.playerOne.score < 3) {
+    if (this.playerTwo.score >= this.playerOne.score + 2) {
       this.gameWinner = this.playerTwo.name
       return true
     }

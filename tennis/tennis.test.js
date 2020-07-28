@@ -63,6 +63,22 @@ Deno.test("when both players are on 40-40, and a player wins a point, the score 
   assertEquals(score, "A-40")
 })
 
+Deno.test("when both players are on 40-40, and a player wins the next two consecutive points, that player is deemed the winner", () => {
+  const match = new TennisMatch("Roger Federer", "Rafael Nadal");
+  match.playerOneWinsAPoint();
+  match.playerOneWinsAPoint();
+  match.playerOneWinsAPoint();
+  match.playerTwoWinsAPoint();
+  match.playerTwoWinsAPoint();
+  match.playerTwoWinsAPoint();
+
+  match.playerTwoWinsAPoint();
+  match.playerTwoWinsAPoint();
+
+  const score = match.getScore();
+  assertEquals(score, "Game won by Rafael Nadal")
+})
+
 Deno.test("when it's advantage, and the opposing player wins the point, score returns to 40-40", () => {
   const match = new TennisMatch("Roger Federer", "Rafael Nadal");
   match.playerOneWinsAPoint();
@@ -78,4 +94,3 @@ Deno.test("when it's advantage, and the opposing player wins the point, score re
   const score = match.getScore();
   assertEquals(score, "40-40")
 })
-
