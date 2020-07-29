@@ -34,12 +34,12 @@ export default class TennisMatch {
   }
 
   gameHasAWinner() {
-    if (this.playerOne.score >= this.playerTwo.score + 2) {
+    if (this.playerOne.score >= 4 && this.playerTwo.score + 2 <= this.playerOne.score) {
       this.gameWinner = this.playerOne.name
       return true
     }
 
-    if (this.playerTwo.score >= this.playerOne.score + 2) {
+    if (this.playerTwo.score >= 4 && this.playerOne.score + 2 <= this.playerTwo.score) {
       this.gameWinner = this.playerTwo.name
       return true
     }
@@ -80,7 +80,7 @@ export default class TennisMatch {
       case 3:
         return "40";
       default:
-        throw new Error("Score is out of bounds")
+        throw new Error(`Score is out of bounds: ${score}`)
     }
   }
 }
