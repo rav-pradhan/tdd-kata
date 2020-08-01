@@ -1,80 +1,8 @@
-package tennis_test
+package tennis
 
 import (
-	"fmt"
 	"testing"
 )
-
-type Match struct {
-	PlayerOne  Player
-	PlayerTwo  Player
-	GameWinner string
-}
-
-func (m *Match) GetScore() string {
-	var result string
-
-	if m.PlayerOne.Score+m.PlayerTwo.Score <= 6 {
-		playerOneTranslatedScore := m.TranslateScore(m.PlayerOne.Score)
-		playerTwoTranslatedScore := m.TranslateScore(m.PlayerTwo.Score)
-		result = fmt.Sprintf("%s-%s", playerOneTranslatedScore, playerTwoTranslatedScore)
-	} else {
-		result = m.calculateDeuceScenario()
-	}
-
-	return result
-}
-
-func (m *Match) PlayerOneWinsAPoint() {
-	m.PlayerOne.Score++
-}
-
-func (m *Match) PlayerTwoWinsAPoint() {
-	m.PlayerTwo.Score++
-}
-
-func (m *Match) calculateDeuceScenario() string {
-	if m.PlayerOne.Score == 4 && m.PlayerTwo.Score == 3 {
-		return fmt.Sprintf("%s-%s", "A", "40")
-	} else if m.PlayerOne.Score == 3 && m.PlayerTwo.Score == 4 {
-		return fmt.Sprintf("%s-%s", "40", "A")
-	}
-	return "40-40"
-}
-
-func (m *Match) TranslateScore(score int) string {
-	switch score {
-	case 0:
-		return "0"
-	case 1:
-		return "15"
-	case 2:
-		return "30"
-	case 3:
-		return "40"
-	default:
-		return ""
-	}
-}
-
-type Player struct {
-	Name  string
-	Score int
-}
-
-// New creates an instance of a Match struct
-func New(p1, p2 string) Match {
-	return Match{
-		PlayerOne: Player{
-			Name:  p1,
-			Score: 0,
-		},
-		PlayerTwo: Player{
-			Name:  p2,
-			Score: 0,
-		},
-	}
-}
 
 func TestTennis(t *testing.T) {
 	t.Run("Test that a tennis match is created with two players", func(t *testing.T) {
@@ -163,6 +91,17 @@ func TestTennis(t *testing.T) {
 
 		if match.GetScore() != "40-40" {
 			t.Errorf("Match score not correct. Expected %s and got %s", "40-40", match.GetScore())
+		}
+	})
+
+	t.Run("Test that when the score is 40-40, and player one wins the next two points, then player one wins the game", func(t *testing.T) {
+		match := New("Rafael Nadal", "Novak Djokovic")
+		setScore(&match, 3, 3)
+		match.PlayerOneWinsAPoint()
+		match.PlayerOneWinsAPoint()
+
+		if match.GetScore() != "Game won by Rafael Nadal" {
+			t.Errorf("Match score not correct. Expected %s and got %s", "Game won by Rafael Nadal", match.GetScore())
 		}
 	})
 }
