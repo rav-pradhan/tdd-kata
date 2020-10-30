@@ -2,35 +2,64 @@ package tennis
 
 import "fmt"
 
+const (
+	deuceGameScore = 6
+)
+
+// Match struct contains the Players and GameWinner
 type Match struct {
 	PlayerOne  Player
 	PlayerTwo  Player
 	GameWinner string
 }
 
-func (m *Match) GetScore() string {
-	var result string
+// Player struct contains name and current game score
+type Player struct {
+	Name  string
+	Score int
+}
 
+// New creates an instance of a Match struct
+func New(p1, p2 string) Match {
+	return Match{
+		PlayerOne: Player{
+			Name:  p1,
+			Score: 0,
+		},
+		PlayerTwo: Player{
+			Name:  p2,
+			Score: 0,
+		},
+	}
+}
+
+// GetScore fetches the current game's score
+func (m *Match) GetScore() string {
 	if m.gameHasAWinner() {
 		return fmt.Sprintf("Game won by %s", m.GameWinner)
 	}
-
-	if m.PlayerOne.Score+m.PlayerTwo.Score <= 6 {
-		playerOneTranslatedScore := m.translateScore(m.PlayerOne.Score)
-		playerTwoTranslatedScore := m.translateScore(m.PlayerTwo.Score)
-		result = fmt.Sprintf("%s-%s", playerOneTranslatedScore, playerTwoTranslatedScore)
-	} else {
-		result = m.calculateDeuceScenario()
-	}
-	return result
+	return m.calculateScore()
 }
 
+// PlayerOneWinsAPoint increments player one's score
 func (m *Match) PlayerOneWinsAPoint() {
 	m.PlayerOne.Score++
 }
 
+// PlayerTwoWinsAPoint increments player two's score
 func (m *Match) PlayerTwoWinsAPoint() {
 	m.PlayerTwo.Score++
+}
+
+func (m *Match) calculateScore() string {
+	if m.notADeuceGame() {
+		return fmt.Sprintf("%s-%s", m.translateScore(m.PlayerOne.Score), m.translateScore(m.PlayerTwo.Score))
+	}
+	return m.calculateDeuceScenario()
+}
+
+func (m *Match) notADeuceGame() bool {
+	return m.PlayerOne.Score+m.PlayerTwo.Score <= deuceGameScore
 }
 
 func (m *Match) calculateDeuceScenario() string {
@@ -66,23 +95,4 @@ func (m *Match) gameHasAWinner() bool {
 		return true
 	}
 	return false
-}
-
-type Player struct {
-	Name  string
-	Score int
-}
-
-// New creates an instance of a Match struct
-func New(p1, p2 string) Match {
-	return Match{
-		PlayerOne: Player{
-			Name:  p1,
-			Score: 0,
-		},
-		PlayerTwo: Player{
-			Name:  p2,
-			Score: 0,
-		},
-	}
 }
