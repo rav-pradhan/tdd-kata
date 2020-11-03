@@ -9,7 +9,8 @@ package bowling
 // In the tenth frame a player who rolls a spare or strike is allowed to roll the extra balls to complete the frame. However no more than three balls can be rolled in tenth frame.
 
 const (
-	totalPins = 10
+	totalPins  = 10
+	finalFrame = 9
 )
 
 type Game struct {
@@ -29,42 +30,53 @@ func NewGame() *Game {
 }
 
 func (g *Game) AddFrameScore(rolls ...int) {
-	for i := range g.Frames {
-		if i == 9 {
-			if rolls[0] == totalPins {
-				g.Frames[i].roll1 = rolls[0]
-				g.Frames[i].roll2 = rolls[1]
-				g.Frames[i].roll3 = rolls[2]
-			}
+	for frame := range g.Frames {
+		if frame == finalFrame {
+			g.calculateFinalFrameRolls(rolls)
+			return
 		}
-		if g.Frames[i].Played == false {
-			g.Frames[i].roll1 = rolls[0]
-			g.Frames[i].roll2 = rolls[1]
-			g.Frames[i].Played = true
-			break
+		if g.Frames[frame].Played == false {
+			g.addRollsToNextFrame(frame, rolls)
+			return
 		}
 	}
 }
 
-func (g *Game) GetScore() int {
-	g.calculateTotalScore()
-	return g.score
+func (g *Game) calculateFinalFrameRolls(rolls []int) {
+	g.Frames[finalFrame].roll1 = rolls[0]
+	g.Frames[finalFrame].roll2 = rolls[1]
+	if len(rolls) == 3 {
+		g.Frames[finalFrame].roll3 = rolls[2]
+	}
+	g.Frames[finalFrame].Played = true
+
 }
 
-func (g *Game) calculateTotalScore() {
+func (g *Game) addRollsToNextFrame(frame int, rolls []int) {
+	g.Frames[frame].roll1 = rolls[0]
+	g.Frames[frame].roll2 = rolls[1]
+	g.Frames[frame].Played = true
+}
+
+func (g *Game) GetScore() int {
+	return g.calculateTotalScore()
+}
+
+func (g *Game) calculateTotalScore() int {
 	for i := range g.Frames {
 		if g.frameHadStrike(i) {
-			g.score += (totalPins + g.calculateStrikeBonusScore(i+1))
+			g.score += (totalPins + g.calculateStrikeBonusScore(i))
 			continue
 		}
 
 		if g.frameHadSpare(i) {
-			g.score += (totalPins + g.calculateSpareBonusScore(i+1))
+			g.score += (totalPins + g.calculateSpareBonusScore(i))
 			continue
 		}
 
 		g.score += (g.Frames[i].roll1 + g.Frames[i].roll2)
 	}
+	return g.score
 }
 
 func (g *Game) frameHadStrike(frameIndex int) bool {
@@ -75,23 +87,23 @@ func (g *Game) frameHadSpare(frameIndex int) bool {
 	return g.Frames[frameIndex].roll1+g.Frames[frameIndex].roll2 == totalPins
 }
 
-func (g *Game) calculateStrikeBonusScore(nextFrameIndex int) int {
-	if nextFrameIndex < 10 {
-		if g.Frames[nextFrameIndex].roll1 == 10 && nextFrameIndex+1 < 11 {
-			return g.Frames[nextFrameIndex].roll1 + g.Frames[nextFrameIndex+1].roll1
-		}
-		return g.Frames[nextFrameIndex].roll1 + g.Frames[nextFrameIndex].roll2
+func (g *Game) calculateStrikeBonusScore(frameIndex int) int {
+	if frameIndex < finalFrame {
+		return g.calculateMidFrameStrikeBonus(frameIndex + 1)
 	}
-
-	if nextFrameIndex == 10 {
-		return g.Frames[9].roll2 + g.Frames[9].roll3
-	}
-	return 0
+	return g.Frames[finalFrame].roll2 + g.Frames[finalFrame].roll3
 }
 
-func (g *Game) calculateSpareBonusScore(nextFrameIndex int) int {
-	if nextFrameIndex < 10 {
+func (g *Game) calculateMidFrameStrikeBonus(nextFrameIndex int) int {
+	if g.Frames[nextFrameIndex].roll1 == totalPins && nextFrameIndex+1 <= finalFrame {
 		return g.Frames[nextFrameIndex].roll1 + g.Frames[nextFrameIndex+1].roll1
 	}
-	return 0
+	return g.Frames[nextFrameIndex].roll1 + g.Frames[nextFrameIndex].roll2
+}
+
+func (g *Game) calculateSpareBonusScore(frameIndex int) int {
+	if frameIndex == finalFrame {
+		return g.Frames[finalFrame].roll3
+	}
+	return g.Frames[frameIndex+1].roll1
 }
