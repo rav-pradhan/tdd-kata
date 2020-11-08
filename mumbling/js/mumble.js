@@ -1,6 +1,5 @@
 export default function mumbleLetters(string = "") {
-  let mumbledLetters = buildMumbledLettersArray(string)
-  return mumbledLetters.join('-');
+  return buildMumbledLettersArray(string).join('-')
 }
 
 const buildMumbledLettersArray = (string = "") => {
