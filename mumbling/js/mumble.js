@@ -1,11 +1,14 @@
 export default function mumbleLetters(string = "") {
-  let mumbledResult = string.split("").map((character, index) => {
+  let mumbledLetters = buildMumbledLettersArray(string)
+  return mumbledLetters.join('-');
+}
+
+const buildMumbledLettersArray = (string = "") => {
+  return string.split("").map((character, index) => {
     let mumbledEntry = [];
     mumbledEntry.push(repeatLetter(character, index))
     return mumbledEntry
   })
-
-  return mumbledResult.join('-');
 }
 
 const repeatLetter = (letter = '', numberOfTimes = 0) => {
