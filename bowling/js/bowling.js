@@ -1,25 +1,30 @@
+const bowlingSymbols = {
+  SPARE: "/",
+  STRIKE: "X"
+}
+
 const bowlingScore = (frames = "") => {
   let finalScore = 0;
   const sanitisedFrames = buildFramesAsNumberedScores(frames);
-  for (let i = 0; i < sanitisedFrames.length; i++) {
-    let frameScore = calculateFrameScore(sanitisedFrames, i);
-    finalScore += frameScore;
-  }
+  sanitisedFrames.forEach((_, i) => {
+    finalScore += calculateFrameScore(sanitisedFrames, i)
+  })
   return finalScore;
 };
 
 const buildFramesAsNumberedScores = (frames) => {
   return frames.split(" ").map((frame) => {
     let rollScores = [];
-    for (let i = 0; i < frame.length; i++) {
-      if (frame[i] == "/") {
-        rollScores.push(10 - parseInt(frame[i - 1]));
-      } else if (frame[i] == "X") {
-        rollScores.push(10);
-      } else {
-        rollScores.push(parseInt(frame[i]));
-      }
-    }
+    [...frame].forEach(roll => {
+      if (roll == bowlingSymbols.SPARE) {
+        return rollScores.push(10 - parseInt(frame[0]));
+      } 
+      
+      if (roll == bowlingSymbols.STRIKE) {
+        return rollScores.push(10);
+      }   
+      rollScores.push(parseInt(roll));
+    })
     return rollScores;
   });
 };
